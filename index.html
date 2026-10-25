@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Painel da Família</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF7F2;
+    --parchment:#F5ECD7;
+    --sage:#8FAF8A;
+    --sage-dark:#6f9269;
+    --pink:#E8B4B8;
+    --pink-dark:#d68f95;
+    --cocoa:#8B6F5E;
+    --ink:#4a3b32;
+    --radius:22px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--cream);
+    font-family:'Quicksand',sans-serif;
+    color:var(--ink);
+    overflow:hidden;
+  }
+  .wrap{
+    height:100vh;
+    display:grid;
+    grid-template-rows:auto 1fr;
+    padding:18px 22px 12px;
+    gap:14px;
+  }
+  /* ---------- HEADER ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 4px;
+  }
+  .greet-block{display:flex;align-items:center;gap:14px;}
+  .greeting h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.7rem;
+    margin:0;
+    color:var(--cocoa);
+  }
+  .greeting p{margin:2px 0 0;font-size:0.95rem;color:var(--ink);opacity:0.75;}
+  .clock{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:2rem;
+    color:var(--cocoa);
+    text-align:right;
+  }
+  .clock small{display:block;font-family:'Quicksand',sans-serif;font-style:normal;font-size:0.8rem;font-weight:600;opacity:0.7;}
+
+  .header-right{display:flex;align-items:center;gap:16px;}
+  .weather{
+    display:flex;align-items:center;gap:8px;
+    background:var(--parchment);border-radius:16px;padding:8px 14px;
+  }
+  .weather .wicon{font-size:1.7rem;line-height:1;}
+  .weather .wtext{text-align:left;}
+  .weather .wtemp{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--cocoa);}
+  .weather .wcond{font-size:0.72rem;opacity:0.7;text-transform:capitalize;}
+
+  /* Alex mascot */
+  .mascot{width:56px;height:56px;flex-shrink:0;}
+
+  /* ---------- GRID ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 2.2fr 0.85fr;
+    gap:16px;
+    min-height:0;
+  }
+  .card{
+    background:var(--parchment);
+    border-radius:var(--radius);
+    padding:16px 16px 14px;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    box-shadow:0 2px 0 rgba(139,111,94,0.08);
+  }
+  .card h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.05rem;
+    margin:0 0 10px;
+    color:var(--cocoa);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .week-nav{display:flex;align-items:center;gap:6px;font-family:'Quicksand',sans-serif;}
+  .nav-btn{
+    border:none;background:var(--sage);color:#fff;border-radius:8px;
+    width:26px;height:26px;font-size:0.8rem;cursor:pointer;
+  }
+  .week-label{font-size:0.72rem;font-weight:600;opacity:0.8;min-width:80px;text-align:center;}
+  .nav-today{
+    border:none;background:var(--cream);color:var(--cocoa);border-radius:8px;
+    padding:4px 9px;font-size:0.7rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;
+  }
+  .scroll{overflow-y:auto;flex:1;min-height:0;padding-right:2px;}
+  .scroll::-webkit-scrollbar{width:5px;}
+  .scroll::-webkit-scrollbar-thumb{background:var(--sage);border-radius:10px;}
+
+  /* ---------- SHOPPING LIST ---------- */
+  .add-row{display:flex;gap:6px;margin-bottom:10px;}
+  .add-row input{
+    flex:1;border:none;border-radius:12px;padding:9px 12px;
+    font-family:'Quicksand',sans-serif;font-size:0.9rem;background:var(--cream);
+  }
+  .add-row button{
+    border:none;border-radius:12px;background:var(--sage);color:#fff;
+    width:38px;font-size:1.2rem;cursor:pointer;
+  }
+  ul.shop{list-style:none;margin:0;padding:0;}
+  ul.shop li{
+    display:flex;align-items:center;gap:8px;
+    background:var(--cream);border-radius:12px;
+    padding:8px 10px;margin-bottom:6px;font-size:0.92rem;
+  }
+  ul.shop li.done span{text-decoration:line-through;opacity:0.45;}
+  ul.shop li .chk{
+    width:20px;height:20px;border-radius:50%;border:2px solid var(--sage);
+    flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  ul.shop li.done .chk{background:var(--sage);}
+  ul.shop li .chk::after{content:'';width:9px;height:9px;border-radius:50%;background:#fff;display:none;}
+  ul.shop li.done .chk::after{display:block;}
+  ul.shop li span{flex:1;}
+  ul.shop li .del{cursor:pointer;opacity:0.4;font-size:0.9rem;}
+  .empty{opacity:0.5;font-size:0.85rem;text-align:center;padding:16px 0;}
+
+  /* ---------- CALENDAR ---------- */
+  .week{display:flex;gap:6px;flex:1;min-height:0;}
+  .day{
+    flex:1 1 0;
+    background:var(--cream);border-radius:14px;padding:8px 6px;
+    display:flex;flex-direction:column;min-height:0;height:100%;
+  }
+  .day.today{background:var(--sage);color:#fff;}
+  .day .dname{font-size:0.72rem;font-weight:700;text-transform:uppercase;opacity:0.7;}
+  .day.today .dname{opacity:0.9;}
+  .day .dnum{font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:4px;}
+  .day .evs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;}
+  .ev{
+    font-size:0.66rem;border-radius:8px;padding:3px 5px;color:#fff;line-height:1.25;
+    cursor:pointer;word-break:break-word;
+  }
+  .ev b{font-size:0.66rem;}
+  .day-add{
+    margin-top:4px;border:none;background:rgba(0,0,0,0.06);border-radius:8px;
+    font-size:0.9rem;cursor:pointer;padding:2px 0;color:inherit;
+  }
+  .day.today .day-add{background:rgba(255,255,255,0.25);}
+
+  /* ---------- SUGGESTIONS + SPOTIFY ---------- */
+  .tip{
+    background:var(--cream);border-radius:14px;padding:12px;font-size:0.88rem;
+    margin-bottom:12px;line-height:1.4;
+  }
+  .tip strong{display:block;font-family:'Fraunces',serif;font-size:0.95rem;color:var(--cocoa);margin-bottom:4px;}
+  .tip-btn{
+    border:none;background:var(--pink);color:#fff;border-radius:12px;
+    padding:6px 12px;font-size:0.8rem;cursor:pointer;font-family:'Quicksand',sans-serif;font-weight:600;
+  }
+  .spotify-title{
+    font-family:'Fraunces',serif;font-weight:600;font-size:0.95rem;
+    color:var(--cocoa);margin:4px 0 8px;
+  }
+  .spot-list{display:flex;flex-direction:column;gap:8px;}
+  .spot-btn{
+    display:flex;align-items:center;gap:10px;
+    background:var(--cream);border-radius:12px;padding:10px 12px;
+    text-decoration:none;color:var(--ink);font-weight:600;font-size:0.88rem;
+  }
+  .app-links{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .app-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    border-radius:14px;padding:13px 10px;text-decoration:none;
+    font-weight:700;font-size:0.95rem;font-family:'Quicksand',sans-serif;
+  }
+  .app-btn.spotify{background:var(--sage);color:#fff;}
+  .app-btn.youtube{background:#d64545;color:#fff;}
+
+  .pen-block{
+    background:var(--cream);border-radius:14px;padding:10px 12px;margin-bottom:10px;
+  }
+  .pen-person-row{
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+    background:#fff;border-radius:10px;padding:6px 8px;margin-bottom:6px;flex-wrap:wrap;
+  }
+  .pen-person-row .pname{font-size:0.78rem;font-weight:700;min-width:52px;}
+  .click-reset{
+    display:block;margin:6px auto 0;border:none;background:none;
+    color:var(--cocoa);opacity:0.55;font-size:0.7rem;text-decoration:underline;cursor:pointer;
+    font-family:'Quicksand',sans-serif;
+  }
+  .pen-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;}
+  .pen-head .pname{font-weight:700;font-size:0.85rem;}
+  .pen-head .remaining{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--cocoa);}
+  .pen-head .remaining small{font-family:'Quicksand',sans-serif;font-size:0.65rem;opacity:0.6;}
+  .pen-bar{background:#e8ded0;border-radius:6px;height:7px;overflow:hidden;margin-bottom:8px;}
+  .pen-bar-fill{height:100%;background:var(--sage);border-radius:6px;}
+  .pen-bar-fill.low{background:var(--pink-dark);}
+  .pen-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .pen-controls button.step{
+    width:24px;height:24px;border:none;border-radius:7px;background:var(--sage);
+    color:#fff;font-size:0.9rem;cursor:pointer;line-height:1;flex-shrink:0;
+  }
+  .pen-controls input{
+    width:52px;border:none;border-radius:8px;padding:5px 6px;
+    font-family:'Quicksand',sans-serif;font-size:0.8rem;background:#fff;
+  }
+  .pen-controls .reg{
+    border:none;background:var(--cocoa);color:#fff;border-radius:8px;
+    padding:5px 9px;font-size:0.7rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;
+  }
+  .pen-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:0.68rem;opacity:0.7;}
+  .pen-foot button{
+    border:none;background:none;color:var(--cocoa);text-decoration:underline;
+    font-size:0.68rem;cursor:pointer;font-family:'Quicksand',sans-serif;opacity:0.8;
+  }
+  .hist-week{
+    background:var(--cream);border-radius:10px;padding:7px 10px;margin-bottom:5px;font-size:0.75rem;
+  }
+  .hist-week .hdate{font-weight:700;color:var(--cocoa);display:block;margin-bottom:2px;}
+
+
+  /* ---------- MODAL ---------- */
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(74,59,50,0.45);
+    display:none;align-items:center;justify-content:center;z-index:50;
+  }
+  .modal-bg.open{display:flex;}
+  .modal{
+    background:var(--parchment);border-radius:20px;padding:20px;width:280px;
+  }
+  .modal h3{margin:0 0 12px;font-family:'Fraunces',serif;color:var(--cocoa);}
+  .modal input,.modal select{
+    width:100%;border:none;border-radius:10px;padding:9px 10px;margin-bottom:10px;
+    font-family:'Quicksand',sans-serif;font-size:0.9rem;background:var(--cream);
+  }
+  .modal .row{display:flex;gap:8px;}
+  .modal button{
+    flex:1;border:none;border-radius:10px;padding:9px 0;font-weight:700;cursor:pointer;
+    font-family:'Quicksand',sans-serif;
+  }
+  .modal .save{background:var(--sage);color:#fff;}
+  .modal .cancel{background:var(--cream);color:var(--ink);}
+  .modal .danger{background:var(--pink-dark);color:#fff;}
+
+  .sync-status{font-size:0.68rem;opacity:0.8;margin:-4px 0 8px;display:none;}
+  .sync-link{
+    border:none;background:none;color:var(--cocoa);text-decoration:underline;
+    font-size:0.68rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;padding:0;
+  }
+  .ev-detail-text{font-size:0.95rem;line-height:1.35;margin:0 0 6px;word-break:break-word;}
+  .ev-detail-meta{font-size:0.78rem;opacity:0.7;margin:0 0 12px;text-transform:capitalize;}
+  .ev-detail-note{font-size:0.72rem;opacity:0.75;margin:0 0 10px;}
+
+  .modal.wide{width:92vw;max-width:520px;max-height:92vh;overflow-y:auto;}
+  .set-section{margin-bottom:14px;}
+  .set-section b{display:block;font-family:'Fraunces',serif;color:var(--cocoa);margin-bottom:6px;}
+  .set-section button{width:100%;margin-top:6px;}
+  .set-help{font-size:0.72rem;opacity:0.75;margin:0 0 8px;line-height:1.35;}
+  .modal textarea{
+    width:100%;border:none;border-radius:10px;padding:9px 10px;margin-bottom:6px;
+    font-family:monospace;font-size:0.72rem;background:var(--cream);color:var(--ink);resize:vertical;
+  }
+  .set-msg{font-size:0.75rem;min-height:1.2em;margin:0 0 10px;color:var(--cocoa);font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="greet-block">
+      <svg class="mascot" viewBox="0 0 100 100" fill="none">
+        <ellipse cx="50" cy="58" rx="30" ry="26" fill="#E8B4B8"/>
+        <path d="M25 40 L18 15 L40 30 Z" fill="#E8B4B8"/>
+        <path d="M75 40 L82 15 L60 30 Z" fill="#E8B4B8"/>
+        <path d="M28 42 L22 20 L42 32 Z" fill="#8B6F5E"/>
+        <path d="M72 42 L78 20 L58 32 Z" fill="#8B6F5E"/>
+        <ellipse cx="38" cy="55" rx="4" ry="5" fill="#4a3b32"/>
+        <ellipse cx="62" cy="55" rx="4" ry="5" fill="#4a3b32"/>
+        <path d="M45 66 Q50 70 55 66" stroke="#4a3b32" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="50" cy="60" rx="3" ry="2.2" fill="#4a3b32"/>
+      </svg>
+      <div class="greeting">
+        <h1 id="greetText">Olá, família!</h1>
+        <p>O vosso cantinho na geladeira 🍑</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="weather" id="weatherBox">
+        <span class="wicon" id="wIcon">🌤️</span>
+        <div class="wtext">
+          <div class="wtemp" id="wTemp">--°</div>
+          <div class="wcond" id="wCond">a carregar...</div>
+        </div>
+      </div>
+      <div class="clock">
+        <span id="clockTime">--:--</span>
+        <small id="clockDate">-- de -- --</small>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- LISTA DE COMPRAS -->
+    <section class="card">
+      <h2>🛒 Lista de Compras</h2>
+      <div class="add-row">
+        <input id="shopInput" type="text" placeholder="Adicionar item...">
+        <button onclick="addShopItem()">+</button>
+      </div>
+      <div class="scroll">
+        <ul class="shop" id="shopList"></ul>
+      </div>
+    </section>
+
+    <!-- CALENDÁRIO -->
+    <section class="card">
+      <h2>
+        📅 Calendário da Semana
+        <span class="week-nav">
+          <button class="nav-btn" onclick="changeWeek(-1)">◀</button>
+          <span id="weekLabel" class="week-label"></span>
+          <button class="nav-btn" onclick="changeWeek(1)">▶</button>
+          <button class="nav-today" onclick="goToday()">Hoje</button>
+        </span>
+      </h2>
+      <div class="sync-status" id="syncStatus"></div>
+      <div class="week" id="weekGrid"></div>
+    </section>
+
+    <!-- SUGESTÕES + SPOTIFY -->
+    <section class="card">
+      <h2>💡 Sugestões</h2>
+      <div class="tip" id="tipBox">
+        <strong id="tipTitle">Dica do dia</strong>
+        <span id="tipText">A carregar...</span>
+      </div>
+      <button class="tip-btn" onclick="nextTip()">Próxima dica →</button>
+
+      <div class="scroll">
+
+        <div class="app-links">
+          <a class="app-btn spotify" id="spotBtn" href="#" onclick="return openApp(CONFIG.spotify);">🎵 Abrir Spotify</a>
+          <a class="app-btn youtube" id="ytBtn" href="#" onclick="return openApp(CONFIG.youtube);">▶️ Abrir YouTube</a>
+        </div>
+
+        <div class="spotify-title" style="margin-top:16px;">💉 Caneta Mounjaro</div>
+        <div id="penPanel"></div>
+
+        <button class="click-reset" id="historyToggle" onclick="toggleHistory()">ver histórico ▾</button>
+        <div id="historyBox" style="display:none;"></div>
+
+        <button class="click-reset" onclick="openSettings()">⚙️ definições e cópia de segurança</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- MODAL: novo evento -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>Novo evento</h3>
+    <input id="evText" type="text" placeholder="O quê?">
+    <input id="evTime" type="time">
+    <select id="evPerson"></select>
+    <div class="row">
+      <button class="cancel" onclick="closeModal()">Cancelar</button>
+      <button class="save" onclick="saveEvent()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: detalhe do evento -->
+<div class="modal-bg" id="evDetailBg">
+  <div class="modal">
+    <h3 id="evDetailWho"></h3>
+    <p class="ev-detail-text" id="evDetailText"></p>
+    <p class="ev-detail-meta" id="evDetailMeta"></p>
+    <p class="ev-detail-note" id="evDetailNote"></p>
+    <div class="row">
+      <button class="cancel" onclick="closeEvDetail()">Fechar</button>
+      <button class="danger" id="evDeleteBtn" onclick="confirmDelete()">Apagar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: definições e cópia de segurança -->
+<div class="modal-bg" id="settingsBg">
+  <div class="modal wide">
+    <h3>⚙️ Definições</h3>
+
+    <div class="set-section">
+      <b>Ligação ao Google Calendar</b>
+      <p class="set-help">Fica guardada só neste tablet. Cola o endereço do script (termina em /exec) e a palavra secreta.</p>
+      <input id="setUrl" type="text" placeholder="Endereço do script" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <input id="setToken" type="text" placeholder="Palavra secreta" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="save" onclick="saveSyncSettings()">Guardar ligação</button>
+    </div>
+
+    <div class="set-section">
+      <b>Cópia de segurança</b>
+      <p class="set-help">Guarda compras, caneta, eventos do tablet e a ligação ao Google. O texto inclui a palavra secreta, por isso não o partilhes com mais ninguém. Para restaurar, cola o texto na caixa e carrega em Restaurar.</p>
+      <textarea id="backupBox" rows="4" spellcheck="false" placeholder="A cópia aparece aqui. Para restaurar, cola aqui o texto."></textarea>
+      <div class="row">
+        <button class="cancel" onclick="makeBackup()">Gerar</button>
+        <button class="cancel" onclick="copyBackup()">Copiar</button>
+        <button class="danger" onclick="restoreBackup()">Restaurar</button>
+      </div>
+    </div>
+
+    <div class="set-msg" id="setMsg"></div>
+    <div class="row"><button class="cancel" onclick="closeSettings()">Fechar</button></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURAÇÃO — edita aqui para personalizar o painel
+   ========================================================= */
+const CONFIG = {
+  familyName: "família", // aparece em "Olá, família!"
+
+  // Localização para o widget do tempo (por defeito: Lisboa)
+  // Troca por "Descobrir automaticamente" mudando useGeolocation para true
+  location: { lat: 38.7223, lon: -9.1393, name: "Lisboa" },
+  useGeolocation: false,
+
+  // Membros da família e a cor/ícone da sua etiqueta no calendário
+  people: [
+    { name: "Amanda", color: "#E8B4B8", icon: "🌸" },
+    { name: "Thiago", color: "#8FAF8A", icon: "⌚" },
+    { name: "Dior",   color: "#D9A25E", icon: "🐾" },
+    { name: "Todos",  color: "#8B6F5E", icon: "🏠" }
+  ],
+
+  // Ligação ao Google Calendar da família. Podes preencher aqui OU, melhor, no ⚙️ do painel
+  // (assim o endereço e a palavra secreta não ficam no ficheiro). Vazio = só o tablet.
+  // url   = endereço da "aplicação web" do Apps Script (termina em /exec)
+  // token = a mesma palavra secreta que puseste no script
+  // Eventos no Google devem começar pelo nome: "Amanda: Pilates", "Dior: Veterinário".
+  // Sem nome à frente, aparecem como "Todos".
+  sync: {
+    url: "",
+    token: ""
+  },
+
+  // Spotify: appUri abre a app diretamente; webUrl é usado só se a app não existir
+  spotify: { appUri: "spotify:", webUrl: "https://open.spotify.com" },
+
+  // YouTube: appUri abre a app diretamente; webUrl é usado só se a app não existir
+  youtube: { appUri: "vnd.youtube://", webUrl: "https://www.youtube.com" },
+
+  // Dicas úteis para a casa — adiciona/edita à vontade
+  tips: [
+    "Faz uma lista rápida do que falta no frigorífico antes de sair de casa — evita compras a mais.",
+    "Define um dia fixo por semana para verificar validades na despensa.",
+    "Deixa uma caixa perto da porta para o que precisa de sair (devoluções, encomendas, reciclagem).",
+    "Prepara os ingredientes secos das refeições da semana ao domingo — poupa tempo nos dias úteis.",
+    "Uma vela ou difusor perto da entrada muda logo o ambiente de quem chega a casa.",
+    "Anota no calendário o dia da recolha de recicláveis para não esquecer o balde fora.",
+    "Guarda 10 minutos antes de dormir para arrumar só a cozinha — acordar com ela limpa muda o dia.",
+    "Mantém uma lista fixa de 'produtos que nunca podem faltar' e revê-a mensalmente."
+  ]
+};
+/* ========================================================= */
+
+// A ligação guardada no ⚙️ deste tablet tem prioridade sobre o que está no ficheiro
+try{
+  const savedSync = JSON.parse(localStorage.getItem('fp_sync') || 'null');
+  if(savedSync && savedSync.url && savedSync.token){
+    CONFIG.sync = { url: savedSync.url, token: savedSync.token };
+  }
+}catch(e){}
+
+/* ---------- RELÓGIO E SAUDAÇÃO ---------- */
+function updateClock(){
+  const now = new Date();
+  const h = now.getHours();
+  document.getElementById('clockTime').textContent =
+    now.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('clockDate').textContent =
+    now.toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'});
+  let greet = h < 12 ? "Bom dia" : h < 20 ? "Boa tarde" : "Boa noite";
+  document.getElementById('greetText').textContent = `${greet}, ${CONFIG.familyName}!`;
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+/* ---------- LISTA DE COMPRAS ---------- */
+function loadShop(){ return JSON.parse(localStorage.getItem('fp_shop') || '[]'); }
+function saveShop(items){ localStorage.setItem('fp_shop', JSON.stringify(items)); }
+
+function renderShop(){
+  const items = loadShop();
+  const ul = document.getElementById('shopList');
+  ul.innerHTML = '';
+  if(items.length === 0){
+    ul.innerHTML = '<div class="empty">Lista vazia 🌿</div>';
+    return;
+  }
+  items.forEach(it=>{
+    const li = document.createElement('li');
+    if(it.done) li.classList.add('done');
+    li.innerHTML = `<div class="chk" onclick="toggleShop('${it.id}')"></div>
+                     <span>${it.text}</span>
+                     <span class="del" onclick="delShop('${it.id}')">✕</span>`;
+    ul.appendChild(li);
+  });
+}
+function addShopItem(){
+  const input = document.getElementById('shopInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const items = loadShop();
+  items.push({id: Date.now().toString(), text, done:false});
+  saveShop(items);
+  input.value = '';
+  renderShop();
+}
+document.getElementById('shopInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') addShopItem();
+});
+function toggleShop(id){
+  const items = loadShop();
+  const it = items.find(i=>i.id===id);
+  if(it) it.done = !it.done;
+  saveShop(items); renderShop();
+}
+function delShop(id){
+  saveShop(loadShop().filter(i=>i.id!==id));
+  renderShop();
+}
+renderShop();
+
+/* ---------- CALENDÁRIO ---------- */
+function loadEvents(){ return JSON.parse(localStorage.getItem('fp_events') || '{}'); }
+function saveEvents(ev){ localStorage.setItem('fp_events', JSON.stringify(ev)); }
+
+function dateKey(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+let weekOffset = 0;
+function getWeekDates(){
+  const today = new Date();
+  today.setDate(today.getDate() + weekOffset*7);
+  const dow = today.getDay(); // domingo = 0
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - dow);
+  const days = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(sunday);
+    d.setDate(sunday.getDate()+i);
+    days.push(d);
+  }
+  return days;
+}
+function changeWeek(delta){
+  weekOffset += delta;
+  renderWeek();
+  refreshRemote();
+}
+function goToday(){
+  weekOffset = 0;
+  renderWeek();
+  refreshRemote();
+}
+let pendingDateKey = null;
+
+function renderWeek(){
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  const todayKey = dateKey(new Date());
+  const names = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+  const weekDates = getWeekDates();
+
+  const first = weekDates[0], last = weekDates[6];
+  const fmt = d => d.toLocaleDateString('pt-PT',{day:'numeric',month:'short'});
+  document.getElementById('weekLabel').textContent =
+    weekOffset === 0 ? `Esta semana` : `${fmt(first)} – ${fmt(last)}`;
+
+  weekDates.forEach((d,i)=>{
+    const key = dateKey(d);
+    const isToday = key === todayKey;
+    const col = document.createElement('div');
+    col.className = 'day' + (isToday ? ' today' : '');
+    const dayEvents = eventsForDay(key);
+    col.innerHTML = `
+      <div class="dname">${names[i]}</div>
+      <div class="dnum">${d.getDate()}</div>
+      <div class="evs">
+        ${dayEvents.map(ev=>{
+          const person = CONFIG.people.find(p=>p.name===ev.person) || CONFIG.people[0];
+          return `<div class="ev" style="background:${person.color}" onclick="openEvent('${key}','${safeId(ev.id)}')"><b>${person.icon} ${esc(person.name)}</b><br>${ev.time?ev.time+' ':''}${esc(ev.text)}</div>`;
+        }).join('')}
+      </div>
+      <button class="day-add" onclick="openModal('${key}')">+</button>
+    `;
+    grid.appendChild(col);
+  });
+  renderSyncStatus();
+}
+
+function openModal(key){
+  pendingDateKey = key;
+  const sel = document.getElementById('evPerson');
+  sel.innerHTML = CONFIG.people.map(p=>`<option value="${p.name}">${p.icon} ${p.name}</option>`).join('');
+  document.getElementById('evText').value = '';
+  document.getElementById('evTime').value = '';
+  document.getElementById('modalBg').classList.add('open');
+}
+function closeModal(){ document.getElementById('modalBg').classList.remove('open'); }
+function saveLocalEvent(key, ev){
+  const events = loadEvents();
+  if(!events[key]) events[key] = [];
+  events[key].push({id: Date.now().toString() + Math.floor(Math.random()*1000), text: ev.text, time: ev.time, person: ev.person});
+  saveEvents(events);
+}
+async function saveEvent(){
+  const text = document.getElementById('evText').value.trim();
+  if(!text){ closeModal(); return; }
+  const time = document.getElementById('evTime').value;
+  const person = document.getElementById('evPerson').value;
+  const date = pendingDateKey;
+  closeModal();
+
+  if(syncOn()){
+    try{
+      setSyncMsg('⏳ A enviar para o Google…');
+      await postRemote({action:'create', date, time, title: `${person}: ${text}`});
+      await refreshRemote();
+    }catch(err){
+      // Sem ligação: não perdemos o evento, fica guardado no tablet
+      saveLocalEvent(date, {text, time, person});
+      syncMsg = '⚠️ Sem ligação: evento guardado só no tablet';
+      renderWeek();
+    }
+    return;
+  }
+  saveLocalEvent(date, {text, time, person});
+  renderWeek();
+}
+function delEvent(key, id){
+  const events = loadEvents();
+  events[key] = (events[key]||[]).filter(e=>e.id!==id);
+  saveEvents(events);
+  renderWeek();
+}
+
+/* ---------- GOOGLE CALENDAR (ligação opcional) ---------- */
+let remoteCache = {};      // semana (domingo) -> { data: [eventos] }
+let syncMsg = '';
+let refreshing = false;
+let refreshAgain = false;
+let migrating = false;
+let detailCtx = null;
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function safeId(id){ return String(id).replace(/[^\w@.\-]/g, '_'); }
+function syncOn(){
+  return !!(CONFIG.sync && CONFIG.sync.url && /^https:\/\//.test(CONFIG.sync.url));
+}
+function withTimeout(promise, ms){
+  return Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error('demorou demasiado')), ms))
+  ]);
+}
+
+// "Amanda: Pilates" -> { person: "Amanda", text: "Pilates" }; sem nome à frente = Todos
+function parseTitle(title){
+  const t = String(title || '');
+  const m = t.match(/^\s*([^:–—-]{1,20}?)\s*[:–—-]\s*(.+)$/);
+  if(m){
+    const p = CONFIG.people.find(x => x.name.toLowerCase() === m[1].trim().toLowerCase());
+    if(p) return { person: p.name, text: m[2].trim() };
+  }
+  return { person: 'Todos', text: t.trim() };
+}
+
+function weekStartKey(){ return dateKey(getWeekDates()[0]); }
+function remoteMap(){
+  const k = weekStartKey();
+  if(!remoteCache[k]){
+    try{ remoteCache[k] = JSON.parse(localStorage.getItem('fp_gcal_' + k) || 'null'); }catch(e){ remoteCache[k] = null; }
+  }
+  return remoteCache[k] || {};
+}
+function eventsForDay(key){
+  const local = (loadEvents()[key] || []).map(e => Object.assign({}, e, {remote:false}));
+  const remote = syncOn() ? (remoteMap()[key] || []) : [];
+  return remote.concat(local).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+}
+
+async function fetchRemote(weekDates){
+  const from = dateKey(weekDates[0]);
+  const last = weekDates[6];
+  const to = dateKey(new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1));
+  const url = `${CONFIG.sync.url}?token=${encodeURIComponent(CONFIG.sync.token)}&from=${from}&to=${to}`;
+  const res = await withTimeout(fetch(url), 20000);
+  const data = await res.json();
+  if(data.error) throw new Error(data.error);
+  const map = {};
+  (data.events || []).forEach(ev => {
+    const p = parseTitle(ev.title);
+    (map[ev.date] = map[ev.date] || []).push({
+      id: ev.id, remote: true, recurring: !!ev.recurring,
+      time: ev.time || '', text: p.text, person: p.person
+    });
+  });
+  remoteCache[from] = map;
+  try{ localStorage.setItem('fp_gcal_' + from, JSON.stringify(map)); }catch(e){}
+}
+
+async function postRemote(payload){
+  const res = await withTimeout(fetch(CONFIG.sync.url, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'}, // evita pré-verificação CORS
+    body: JSON.stringify(Object.assign({token: CONFIG.sync.token}, payload))
+  }), 20000);
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error || 'erro desconhecido');
+  return data;
+}
+
+async function refreshRemote(){
+  if(!syncOn()) return;
+  if(refreshing){ refreshAgain = true; return; }
+  refreshing = true;
+  do{
+    refreshAgain = false;
+    try{
+      await fetchRemote(getWeekDates());
+      const t = new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+      syncMsg = `🔄 Google Calendar · atualizado às ${t}`;
+    }catch(err){
+      syncMsg = err.message === 'sem permissão'
+        ? '⚠️ A palavra secreta do painel não é a do script'
+        : '⚠️ Sem ligação ao Google (a mostrar a última cópia)';
+    }
+  }while(refreshAgain);
+  refreshing = false;
+  renderWeek();
+}
+
+function setSyncMsg(msg){ syncMsg = msg; renderSyncStatus(); }
+function localPendingCount(){
+  const ev = loadEvents(), today = dateKey(new Date());
+  let n = 0;
+  Object.keys(ev).forEach(k => { if(k >= today) n += (ev[k] || []).length; });
+  return n;
+}
+function renderSyncStatus(){
+  const el = document.getElementById('syncStatus');
+  if(!syncOn()){ el.style.display = 'none'; return; }
+  const n = localPendingCount();
+  let html = esc(syncMsg);
+  if(n > 0 && !migrating){
+    html += ` <button class="sync-link" onclick="migrateLocal()">enviar ${n} evento${n>1?'s':''} do tablet para o Google</button>`;
+  }
+  el.innerHTML = html;
+  el.style.display = html ? 'block' : 'none';
+}
+
+// Envia para o Google os eventos que estavam só guardados no tablet (de hoje em diante)
+async function migrateLocal(){
+  if(migrating || !syncOn()) return;
+  migrating = true;
+  setSyncMsg('⏳ A enviar eventos do tablet para o Google…');
+  const ev = loadEvents(), today = dateKey(new Date());
+  let failed = 0;
+  for(const k of Object.keys(ev).sort()){
+    if(k < today) continue;
+    const keep = [];
+    for(const e of ev[k]){
+      try{
+        await postRemote({action:'create', date:k, time:e.time || '', title:`${e.person}: ${e.text}`});
+      }catch(err){ keep.push(e); failed++; }
+    }
+    if(keep.length) ev[k] = keep; else delete ev[k];
+    saveEvents(ev);
+  }
+  migrating = false;
+  await refreshRemote();
+  if(failed){ syncMsg = `⚠️ ${failed} evento(s) não foram enviados, tenta de novo`; renderSyncStatus(); }
+}
+
+// Toque num evento: ver detalhe e, se quiseres, apagar
+function openEvent(key, id){
+  const ev = eventsForDay(key).find(e => safeId(e.id) === id);
+  if(!ev) return;
+  detailCtx = {key, ev};
+  const person = CONFIG.people.find(p => p.name === ev.person) || CONFIG.people[0];
+  const d = new Date(key + 'T00:00:00');
+  document.getElementById('evDetailWho').textContent = `${person.icon} ${person.name}`;
+  document.getElementById('evDetailText').textContent = ev.text;
+  document.getElementById('evDetailMeta').textContent =
+    d.toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'}) + (ev.time ? ' · ' + ev.time : '');
+  const locked = ev.remote && ev.recurring;
+  document.getElementById('evDetailNote').textContent = locked
+    ? 'Evento repetido: para o alterar, usa o Google Calendar.'
+    : (ev.remote ? 'Ao apagar, desaparece também do Google Calendar.' : '');
+  document.getElementById('evDeleteBtn').style.display = locked ? 'none' : '';
+  document.getElementById('evDetailBg').classList.add('open');
+}
+function closeEvDetail(){ document.getElementById('evDetailBg').classList.remove('open'); }
+async function confirmDelete(){
+  if(!detailCtx) return;
+  const {key, ev} = detailCtx;
+  detailCtx = null;
+  closeEvDetail();
+  if(!ev.remote){ delEvent(key, ev.id); return; }
+  try{
+    setSyncMsg('⏳ A apagar no Google…');
+    await postRemote({action:'delete', id: ev.id});
+    await refreshRemote();
+  }catch(err){
+    syncMsg = '⚠️ Não consegui apagar: ' + err.message;
+    renderSyncStatus();
+  }
+}
+
+/* ---------- DEFINIÇÕES E CÓPIA DE SEGURANÇA ---------- */
+function setMsg(t){ document.getElementById('setMsg').textContent = t; }
+function reloadPage(){ location.reload(); }
+
+function openSettings(){
+  document.getElementById('setUrl').value = (CONFIG.sync && CONFIG.sync.url) || '';
+  document.getElementById('setToken').value = (CONFIG.sync && CONFIG.sync.token) || '';
+  document.getElementById('backupBox').value = '';
+  setMsg('');
+  document.getElementById('settingsBg').classList.add('open');
+}
+function closeSettings(){ document.getElementById('settingsBg').classList.remove('open'); }
+
+function saveSyncSettings(){
+  const url = document.getElementById('setUrl').value.trim();
+  const token = document.getElementById('setToken').value.trim();
+  if(!url && !token){
+    try{ localStorage.removeItem('fp_sync'); }catch(e){}
+    CONFIG.sync = { url: '', token: '' };
+    setMsg('Ligação ao Google desligada neste tablet.');
+    renderWeek();
+    return;
+  }
+  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)){
+    setMsg('O endereço tem de começar por https://script.google.com/ e terminar em /exec');
+    return;
+  }
+  if(!token){ setMsg('Falta a palavra secreta.'); return; }
+  CONFIG.sync = { url: url, token: token };
+  try{ localStorage.setItem('fp_sync', JSON.stringify({ url: url, token: token })); }catch(e){}
+  closeSettings();
+  setSyncMsg('⏳ A ligar ao Google…');
+  refreshRemote();
+}
+
+function buildBackup(){
+  const data = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    // a cache do Google não entra: volta a descarregar-se sozinha
+    if(k && k.indexOf('fp_') === 0 && k.indexOf('fp_gcal_') !== 0) data[k] = localStorage.getItem(k);
+  }
+  return JSON.stringify({ app: 'painel-familia', v: 1, saved: new Date().toISOString(), data: data });
+}
+function makeBackup(){
+  const box = document.getElementById('backupBox');
+  box.value = buildBackup();
+  box.focus(); box.select();
+  setMsg('Cópia gerada. Carrega em Copiar e guarda o texto, por exemplo enviando-o a ti própria por email ou WhatsApp.');
+}
+function copyBackup(){
+  const box = document.getElementById('backupBox');
+  if(!box.value) box.value = buildBackup();
+  box.focus(); box.select();
+  let done = false;
+  try{ done = document.execCommand('copy'); }catch(e){}
+  if(done){ setMsg('Copiado. Cola o texto onde o queres guardar.'); return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(box.value).then(
+      function(){ setMsg('Copiado. Cola o texto onde o queres guardar.'); },
+      function(){ setMsg('Não consegui copiar sozinho: mantém o dedo no texto e escolhe Copiar.'); }
+    );
+    return;
+  }
+  setMsg('Não consegui copiar sozinho: mantém o dedo no texto e escolhe Copiar.');
+}
+function restoreBackup(){
+  const box = document.getElementById('backupBox');
+  let parsed;
+  try{ parsed = JSON.parse(box.value.trim()); }
+  catch(e){ setMsg('Isto não parece uma cópia de segurança. Cola o texto completo.'); return; }
+  if(!parsed || parsed.app !== 'painel-familia' || !parsed.data || typeof parsed.data !== 'object'){
+    setMsg('Isto não é uma cópia deste painel.');
+    return;
+  }
+  let n = 0;
+  Object.keys(parsed.data).forEach(function(k){
+    if(k.indexOf('fp_') === 0 && k.indexOf('fp_gcal_') !== 0 && typeof parsed.data[k] === 'string'){
+      try{ localStorage.setItem(k, parsed.data[k]); n++; }catch(e){}
+    }
+  });
+  setMsg('Restaurado (' + n + ' itens). A recarregar…');
+  setTimeout(reloadPage, 800);
+}
+
+renderWeek();
+refreshRemote();
+setInterval(refreshRemote, 5 * 60000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) refreshRemote(); });
+
+/* ---------- SUGESTÕES ---------- */
+function dailyTipIndex(){
+  const start = new Date(2026,0,1);
+  const diff = Math.floor((new Date() - start) / 86400000);
+  return diff % CONFIG.tips.length;
+}
+let tipIdx = dailyTipIndex();
+function renderTip(){
+  document.getElementById('tipText').textContent = CONFIG.tips[tipIdx];
+}
+function nextTip(){
+  tipIdx = (tipIdx + 1) % CONFIG.tips.length;
+  renderTip();
+}
+renderTip();
+
+/* ---------- TEMPO (Open-Meteo, grátis, sem chave) ---------- */
+const WEATHER_CODES = {
+  0:['☀️','céu limpo'], 1:['🌤️','maioritariamente limpo'], 2:['⛅','parcialmente nublado'],
+  3:['☁️','nublado'], 45:['🌫️','nevoeiro'], 48:['🌫️','nevoeiro gelado'],
+  51:['🌦️','chuvisco fraco'], 53:['🌦️','chuvisco'], 55:['🌧️','chuvisco forte'],
+  61:['🌧️','chuva fraca'], 63:['🌧️','chuva'], 65:['🌧️','chuva forte'],
+  71:['🌨️','neve fraca'], 73:['🌨️','neve'], 75:['❄️','neve forte'],
+  80:['🌦️','aguaceiros'], 81:['🌧️','aguaceiros fortes'], 82:['⛈️','aguaceiros muito fortes'],
+  95:['⛈️','trovoada'], 96:['⛈️','trovoada com granizo'], 99:['⛈️','trovoada forte']
+};
+async function fetchWeather(lat, lon){
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const temp = Math.round(data.current.temperature_2m);
+    const code = data.current.weather_code;
+    const [icon, cond] = WEATHER_CODES[code] || ['🌡️','—'];
+    document.getElementById('wIcon').textContent = icon;
+    document.getElementById('wTemp').textContent = `${temp}°`;
+    document.getElementById('wCond').textContent = cond;
+  }catch(e){
+    document.getElementById('wCond').textContent = 'indisponível';
+  }
+}
+function initWeather(){
+  if(CONFIG.useGeolocation && navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+      () => fetchWeather(CONFIG.location.lat, CONFIG.location.lon)
+    );
+  } else {
+    fetchWeather(CONFIG.location.lat, CONFIG.location.lon);
+  }
+}
+initWeather();
+setInterval(initWeather, 30 * 60000); // atualiza a cada 30 min
+
+/* ---------- CANETA MOUNJARO (240 clicks, partilhada) ---------- */
+const PEN_TOTAL = 240;
+const CLICK_PEOPLE = ["Amanda", "Thiago"];
+
+function loadPen(){
+  const raw = localStorage.getItem('fp_pen');
+  if(raw){
+    const p = JSON.parse(raw);
+    if(typeof p.remaining === 'number' && Array.isArray(p.log)) return p;
+  }
+  return { remaining: PEN_TOTAL, start: dateKey(new Date()), log: [] };
+}
+function savePen(p){ localStorage.setItem('fp_pen', JSON.stringify(p)); }
+
+function registerClicks(person, amount){
+  if(!amount || isNaN(amount)) return;
+  const pen = loadPen();
+  pen.remaining = Math.max(0, Math.min(PEN_TOTAL, pen.remaining - amount));
+  pen.log.push({ date: dateKey(new Date()), person: person, amount: amount });
+  savePen(pen);
+  renderPen();
+}
+function stepClicks(person, delta){
+  registerClicks(person, delta);
+}
+function typedRegister(person){
+  const input = document.getElementById('input-'+person);
+  const val = parseInt(input.value, 10);
+  if(!val){ input.focus(); return; }
+  registerClicks(person, val);
+  input.value = '';
+}
+function newPen(){
+  const pen = loadPen();
+  if(pen.remaining < PEN_TOTAL){
+    const totals = {};
+    CLICK_PEOPLE.forEach(n => totals[n] = 0);
+    pen.log.forEach(e => { totals[e.person] = (totals[e.person]||0) + e.amount; });
+    const hist = JSON.parse(localStorage.getItem('fp_pens_history') || '[]');
+    hist.push({ start: pen.start, end: dateKey(new Date()), used: PEN_TOTAL - pen.remaining, totals });
+    localStorage.setItem('fp_pens_history', JSON.stringify(hist));
+  }
+  savePen({ remaining: PEN_TOTAL, start: dateKey(new Date()), log: [] });
+  renderPen();
+}
+function renderPen(){
+  const pen = loadPen();
+  const wrap = document.getElementById('penPanel');
+  const pct = Math.round((pen.remaining / PEN_TOTAL) * 100);
+  const low = pen.remaining <= 30;
+  wrap.innerHTML = `<div class="pen-block">
+    <div class="pen-head">
+      <span class="pname">Caneta partilhada</span>
+      <span class="remaining">${pen.remaining}<small> / ${PEN_TOTAL}</small></span>
+    </div>
+    <div class="pen-bar"><div class="pen-bar-fill${low?' low':''}" style="width:${pct}%"></div></div>
+    ${CLICK_PEOPLE.map(name=>`
+      <div class="pen-person-row">
+        <span class="pname">${name}</span>
+        <button class="step" onclick="stepClicks('${name}',1)">+1</button>
+        <button class="step" onclick="stepClicks('${name}',-1)">−1</button>
+        <input id="input-${name}" type="number" inputmode="numeric" placeholder="qtd">
+        <button class="reg" onclick="typedRegister('${name}')">registar</button>
+      </div>
+    `).join('')}
+    <div class="pen-foot">
+      <span>caneta desde ${pen.start.split('-').reverse().join('/')}</span>
+      <button onclick="newPen()">nova caneta</button>
+    </div>
+  </div>`;
+}
+renderPen();
+
+function toggleHistory(){
+  const box = document.getElementById('historyBox');
+  const btn = document.getElementById('historyToggle');
+  const showing = box.style.display !== 'none';
+  if(showing){
+    box.style.display = 'none';
+    btn.textContent = 'ver histórico ▾';
+  } else {
+    renderHistory();
+    box.style.display = 'block';
+    btn.textContent = 'esconder histórico ▴';
+  }
+}
+function renderHistory(){
+  const box = document.getElementById('historyBox');
+  const hist = JSON.parse(localStorage.getItem('fp_pens_history') || '[]').slice().reverse();
+  if(hist.length === 0){
+    box.innerHTML = '<div class="empty">Ainda sem canetas terminadas</div>';
+    return;
+  }
+  const fmt = s => s.split('-').reverse().join('/');
+  box.innerHTML = hist.slice(0,10).map(h=>{
+    const parts = CLICK_PEOPLE.map(n=>`${n}: ${(h.totals && h.totals[n]) || 0}`).join(' · ');
+    return `<div class="hist-week"><span class="hdate">${fmt(h.start)} – ${fmt(h.end)} · ${h.used} usados</span>${parts}</div>`;
+  }).join('');
+}
+
+/* ---------- RECARREGAR SOZINHO À MEIA-NOITE ---------- */
+// Como o tablet fica com a página aberta o dia todo, isto recarrega
+// tudo sozinho pouco depois da meia-noite, garantindo que a data,
+// o calendário, etc. começam sempre "frescos".
+function scheduleMidnightReload(){
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 5, 0);
+  setTimeout(()=>{ location.reload(); }, next - now);
+}
+scheduleMidnightReload();
+function openApp(target){
+  let opened = false;
+  function onHide(){ opened = true; }
+  document.addEventListener('visibilitychange', onHide, {once:true});
+  window.location.href = target.appUri;
+  setTimeout(()=>{
+    document.removeEventListener('visibilitychange', onHide);
+    if(!opened){ window.location.href = target.webUrl; }
+  }, 1000);
+  return false; // impede a navegação normal do link
+}
+</script>
+</body>
+</html>
