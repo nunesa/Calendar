@@ -142,6 +142,55 @@
   ul.shop li .del{cursor:pointer;opacity:0.4;font-size:0.9rem;}
   .empty{opacity:0.5;font-size:0.85rem;text-align:center;padding:16px 0;}
 
+  /* ---------- ABAS + DISPENSA ---------- */
+  .card h2.tabs{flex-wrap:nowrap;gap:6px;}
+  .tab{
+    flex:1;border:none;border-radius:12px;padding:8px 4px;cursor:pointer;
+    font-family:'Fraunces',serif;font-weight:600;font-size:0.88rem;
+    background:var(--cream);color:var(--cocoa);
+  }
+  .tab.on{background:var(--sage);color:#fff;}
+  .tab-badge{
+    display:none;margin-left:5px;background:var(--pink-dark);color:#fff;border-radius:10px;
+    padding:1px 7px;font-family:'Quicksand',sans-serif;font-size:0.72rem;font-weight:700;
+  }
+  .tab-badge.on{display:inline-block;}
+  .pane{display:flex;flex-direction:column;flex:1;min-height:0;}
+  .pane.hide{display:none;}
+  .pan-add{
+    border:none;border-radius:12px;background:var(--sage);color:#fff;padding:9px 0;margin-bottom:8px;
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;
+  }
+  .pan-msg{font-size:0.72rem;font-weight:600;color:var(--cocoa);min-height:0;margin:0 2px 6px;}
+  .pan-msg:empty{display:none;}
+  .pan-group{
+    font-size:0.68rem;font-weight:700;color:var(--cocoa);opacity:0.85;
+    text-transform:uppercase;letter-spacing:0.04em;margin:10px 2px 5px;
+  }
+  .pan-row{
+    display:flex;align-items:center;gap:6px;background:var(--cream);border-radius:12px;
+    padding:6px 8px;margin-bottom:6px;border-left:5px solid var(--sage);
+  }
+  .pan-row.low{border-left-color:#e0a63a;}
+  .pan-row.out{border-left-color:var(--pink-dark);}
+  .pan-name{flex:1;min-width:0;font-size:0.9rem;word-break:break-word;cursor:pointer;}
+  .pan-name small{display:block;font-size:0.66rem;opacity:0.8;}
+  .pan-link{
+    border:none;background:none;padding:0;color:var(--cocoa);text-decoration:underline;
+    font-family:'Quicksand',sans-serif;font-size:0.66rem;font-weight:700;cursor:pointer;
+  }
+  .pan-step{
+    width:34px;height:34px;border:none;border-radius:50%;background:var(--sage);color:#fff;
+    font-size:1.2rem;line-height:1;cursor:pointer;flex-shrink:0;
+  }
+  .pan-qty{min-width:24px;text-align:center;font-weight:700;font-size:1rem;}
+  .pan-seed{
+    border:none;background:var(--cream);color:var(--cocoa);border-radius:12px;padding:9px 12px;
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;margin-top:8px;
+  }
+  .modal label.lbl{display:block;font-size:0.72rem;font-weight:700;color:var(--cocoa);margin:0 0 3px 2px;}
+  .modal .row .col{flex:1;}
+
   /* ---------- CALENDAR ---------- */
   .week{display:flex;gap:6px;flex:1;min-height:0;}
   .day{
@@ -322,13 +371,25 @@
 
     <!-- LISTA DE COMPRAS -->
     <section class="card">
-      <h2>🛒 Lista de Compras</h2>
-      <div class="add-row">
-        <input id="shopInput" type="text" placeholder="Adicionar item...">
-        <button onclick="addShopItem()">+</button>
+      <h2 class="tabs">
+        <button class="tab on" id="tabShop" onclick="showTab('shop')">🛒 Compras</button>
+        <button class="tab" id="tabPantry" onclick="showTab('pantry')">🥫 Dispensa<span class="tab-badge" id="pantryBadge"></span></button>
+      </h2>
+
+      <div class="pane" id="paneShop">
+        <div class="add-row">
+          <input id="shopInput" type="text" placeholder="Adicionar item...">
+          <button onclick="addShopItem()">+</button>
+        </div>
+        <div class="scroll">
+          <ul class="shop" id="shopList"></ul>
+        </div>
       </div>
-      <div class="scroll">
-        <ul class="shop" id="shopList"></ul>
+
+      <div class="pane hide" id="panePantry">
+        <button class="pan-add" onclick="openPantryModal()">+ Novo item</button>
+        <div class="pan-msg" id="pantryMsg"></div>
+        <div class="scroll" id="pantryList"></div>
       </div>
     </section>
 
@@ -390,6 +451,24 @@
   </div>
 </div>
 
+<!-- MODAL: item da dispensa -->
+<div class="modal-bg" id="pantryBg">
+  <div class="modal">
+    <h3 id="pantryModalTitle">Novo item</h3>
+    <input id="pName" type="text" placeholder="Ex.: arroz, papel higiénico…" autocomplete="off">
+    <select id="pCat"></select>
+    <div class="row">
+      <div class="col"><label class="lbl" for="pQty">Quantos tenho</label><input id="pQty" type="number" inputmode="numeric" min="0" value="1"></div>
+      <div class="col"><label class="lbl" for="pMin">Avisar quando restar</label><input id="pMin" type="number" inputmode="numeric" min="0" value="1"></div>
+    </div>
+    <div class="row">
+      <button class="cancel" onclick="closePantryModal()">Cancelar</button>
+      <button class="danger" id="pDelBtn" onclick="deletePantryItem()">Apagar</button>
+      <button class="save" onclick="savePantryItem()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: detalhe do evento -->
 <div class="modal-bg" id="evDetailBg">
   <div class="modal">
@@ -419,7 +498,7 @@
 
     <div class="set-section">
       <b>Cópia de segurança</b>
-      <p class="set-help">Guarda compras, caneta, eventos do tablet e a ligação ao Google. O texto inclui a palavra secreta, por isso não o partilhes com mais ninguém. Para restaurar, cola o texto na caixa e carrega em Restaurar.</p>
+      <p class="set-help">Guarda compras, dispensa, caneta, eventos do tablet e a ligação ao Google. O texto inclui a palavra secreta, por isso não o partilhes com mais ninguém. Para restaurar, cola o texto na caixa e carrega em Restaurar.</p>
       <textarea id="backupBox" rows="4" spellcheck="false" placeholder="A cópia aparece aqui. Para restaurar, cola aqui o texto."></textarea>
       <div class="row">
         <button class="cancel" onclick="makeBackup()">Gerar</button>
@@ -522,7 +601,7 @@ function renderShop(){
     const li = document.createElement('li');
     if(it.done) li.classList.add('done');
     li.innerHTML = `<div class="chk" onclick="toggleShop('${it.id}')"></div>
-                     <span>${it.text}</span>
+                     <span>${esc(it.text)}</span>
                      <span class="del" onclick="delShop('${it.id}')">✕</span>`;
     ul.appendChild(li);
   });
@@ -543,14 +622,212 @@ document.getElementById('shopInput').addEventListener('keydown', e=>{
 function toggleShop(id){
   const items = loadShop();
   const it = items.find(i=>i.id===id);
-  if(it) it.done = !it.done;
+  if(it){
+    it.done = !it.done;
+    if(it.done) restockPantryFor(it.text);   // comprado → a dispensa fica reposta
+  }
   saveShop(items); renderShop();
 }
 function delShop(id){
   saveShop(loadShop().filter(i=>i.id!==id));
   renderShop();
+  renderPantry();
 }
 renderShop();
+
+/* ---------- DISPENSA ---------- */
+const PANTRY_CATS = [
+  ['despensa','🥫','Despensa'],
+  ['frio','❄️','Frigorífico e congelador'],
+  ['limpeza','🧼','Limpeza'],
+  ['banho','🛁','Casa de banho'],
+  ['dior','🐾','Dior'],
+  ['outros','📦','Outros']
+];
+const PANTRY_SEED = [
+  ['Arroz','despensa'],['Massa','despensa'],['Azeite','despensa'],['Café','despensa'],
+  ['Leite','despensa'],['Ovos','frio'],['Manteiga','frio'],
+  ['Detergente da loiça','limpeza'],['Detergente da roupa','limpeza'],['Sacos do lixo','limpeza'],
+  ['Papel higiénico','banho'],['Pasta de dentes','banho'],
+  ['Ração do Dior','dior'],['Areia do Dior','dior']
+];
+let pantryEditId = null, pantryMsgTimer = null;
+
+function normName(s){
+  let t = String(s == null ? '' : s).toLowerCase();
+  try{ t = t.normalize('NFD').replace(/[̀-ͯ]/g, ''); }catch(e){}
+  return t.replace(/\s+/g, ' ').trim();
+}
+function catInfo(key){
+  return PANTRY_CATS.find(c => c[0] === key) || PANTRY_CATS[PANTRY_CATS.length - 1];
+}
+function loadPantry(){
+  let a;
+  try{ a = JSON.parse(localStorage.getItem('fp_pantry') || '[]'); }catch(e){ a = []; }
+  if(!Array.isArray(a)) return [];
+  return a.filter(i => i && typeof i.name === 'string' && i.name && /^[\w-]+$/.test(String(i.id)))
+          .map(i => ({
+            id: String(i.id), name: i.name, cat: catInfo(i.cat)[0],
+            qty: Math.max(0, parseInt(i.qty, 10) || 0),
+            min: Math.max(0, parseInt(i.min, 10) || 0)
+          }));
+}
+function savePantry(a){ try{ localStorage.setItem('fp_pantry', JSON.stringify(a)); }catch(e){} }
+function isLow(it){ return it.qty <= it.min; }
+function newPantryId(){ return 'p' + Date.now().toString(36) + Math.floor(Math.random()*1296).toString(36); }
+
+function showTab(which){
+  const pantry = which === 'pantry';
+  document.getElementById('paneShop').classList.toggle('hide', pantry);
+  document.getElementById('panePantry').classList.toggle('hide', !pantry);
+  document.getElementById('tabShop').classList.toggle('on', !pantry);
+  document.getElementById('tabPantry').classList.toggle('on', pantry);
+  if(pantry) renderPantry();
+}
+function pantryNote(msg){
+  const el = document.getElementById('pantryMsg');
+  el.textContent = msg;
+  clearTimeout(pantryMsgTimer);
+  pantryMsgTimer = setTimeout(function(){ el.textContent = ''; }, 5000);
+}
+function onShopList(name){
+  const n = normName(name);
+  return loadShop().some(s => !s.done && normName(s.text) === n);
+}
+// Põe na lista de compras (sem duplicar). Devolve true se acrescentou algo.
+function addToShopList(name){
+  const items = loadShop(), n = normName(name);
+  const same = items.find(s => normName(s.text) === n);
+  if(same && !same.done) return false;
+  if(same) same.done = false;
+  else items.push({id: Date.now().toString() + Math.floor(Math.random()*1000), text: name, done:false});
+  saveShop(items);
+  renderShop();
+  return true;
+}
+function stepPantry(id, d){
+  const all = loadPantry();
+  const it = all.find(i => i.id === id);
+  if(!it) return;
+  const wasLow = isLow(it);
+  it.qty = Math.max(0, it.qty + d);
+  savePantry(all);
+  if(d < 0 && isLow(it) && !wasLow && addToShopList(it.name)){
+    pantryNote('🛒 ' + it.name + ' foi para a lista de compras');
+  } else if(d < 0 && isLow(it) && !wasLow){
+    pantryNote('🛒 ' + it.name + ' já estava na lista de compras');
+  }
+  renderPantry();
+}
+function pantryToList(id){
+  const it = loadPantry().find(i => i.id === id);
+  if(!it) return;
+  addToShopList(it.name);
+  pantryNote('🛒 ' + it.name + ' foi para a lista de compras');
+  renderPantry();
+}
+// Quando se risca um item da lista de compras, a dispensa correspondente fica reposta
+function restockPantryFor(text){
+  const n = normName(text), all = loadPantry();
+  let changed = 0, last = '';
+  all.forEach(function(it){
+    if(normName(it.name) === n && isLow(it)){
+      it.qty = it.min + 1; changed++; last = it.name;
+    }
+  });
+  if(changed){
+    savePantry(all);
+    pantryNote('✅ ' + last + ' reposto na dispensa (ajusta a quantidade com + e −)');
+    renderPantry();
+  }
+}
+function renderPantry(){
+  const all = loadPantry();
+  const box = document.getElementById('pantryList');
+  const low = all.filter(isLow);
+  const badge = document.getElementById('pantryBadge');
+  badge.textContent = low.length || '';
+  badge.classList.toggle('on', low.length > 0);
+
+  if(!all.length){
+    box.innerHTML = '<div class="empty">Ainda não há nada na dispensa 🌿<br>' +
+      '<button class="pan-seed" onclick="seedPantry()">💡 Começar com exemplos</button></div>';
+    return;
+  }
+  function rowHtml(it){
+    const c = catInfo(it.cat);
+    const cls = it.qty === 0 ? 'out' : (isLow(it) ? 'low' : '');
+    let sub = '';
+    if(isLow(it)){
+      sub = onShopList(it.name)
+        ? '<small>🛒 na lista de compras</small>'
+        : '<small><button class="pan-link" onclick="pantryToList(\'' + it.id + '\')">+ pôr na lista de compras</button></small>';
+    }
+    return '<div class="pan-row ' + cls + '">' +
+      '<div class="pan-name" onclick="openPantryModal(\'' + it.id + '\')">' + c[1] + ' ' + esc(it.name) + sub + '</div>' +
+      '<button class="pan-step" onclick="stepPantry(\'' + it.id + '\',-1)" aria-label="menos">−</button>' +
+      '<div class="pan-qty">' + it.qty + '</div>' +
+      '<button class="pan-step" onclick="stepPantry(\'' + it.id + '\',1)" aria-label="mais">+</button>' +
+      '</div>';
+  }
+  const byName = (a,b) => a.name.localeCompare(b.name, 'pt');
+  let html = '';
+  if(low.length){
+    html += '<div class="pan-group">⚠️ A acabar</div>' + low.sort((a,b)=>a.qty-b.qty||byName(a,b)).map(rowHtml).join('');
+  }
+  PANTRY_CATS.forEach(function(c){
+    const list = all.filter(i => !isLow(i) && i.cat === c[0]).sort(byName);
+    if(list.length) html += '<div class="pan-group">' + c[1] + ' ' + esc(c[2]) + '</div>' + list.map(rowHtml).join('');
+  });
+  box.innerHTML = html;
+}
+function seedPantry(){
+  const all = loadPantry();
+  PANTRY_SEED.forEach(function(s){
+    all.push({id:newPantryId(), name:s[0], cat:s[1], qty:2, min:1});
+  });
+  savePantry(all);
+  renderPantry();
+  pantryNote('Exemplos adicionados. Toca no nome de um item para ajustar ou apagar.');
+}
+function openPantryModal(id){
+  const sel = document.getElementById('pCat');
+  sel.innerHTML = PANTRY_CATS.map(c => '<option value="' + c[0] + '">' + c[1] + ' ' + esc(c[2]) + '</option>').join('');
+  pantryEditId = id || null;
+  const it = id ? loadPantry().find(i => i.id === id) : null;
+  if(id && !it){ pantryEditId = null; }
+  document.getElementById('pantryModalTitle').textContent = it ? 'Editar item' : 'Novo item';
+  document.getElementById('pName').value = it ? it.name : '';
+  sel.value = it ? it.cat : 'despensa';
+  document.getElementById('pQty').value = it ? it.qty : 1;
+  document.getElementById('pMin').value = it ? it.min : 1;
+  document.getElementById('pDelBtn').style.display = it ? '' : 'none';
+  document.getElementById('pantryBg').classList.add('open');
+}
+function closePantryModal(){ document.getElementById('pantryBg').classList.remove('open'); }
+function savePantryItem(){
+  const name = document.getElementById('pName').value.trim();
+  if(!name){ document.getElementById('pName').focus(); return; }
+  const cat = document.getElementById('pCat').value;
+  const qty = Math.max(0, parseInt(document.getElementById('pQty').value, 10) || 0);
+  const min = Math.max(0, parseInt(document.getElementById('pMin').value, 10) || 0);
+  const all = loadPantry();
+  let it = pantryEditId ? all.find(i => i.id === pantryEditId) : null;
+  const wasLow = it ? isLow(it) : false;
+  if(it){ it.name = name; it.cat = cat; it.qty = qty; it.min = min; }
+  else { it = {id:newPantryId(), name:name, cat:cat, qty:qty, min:min}; all.push(it); }
+  savePantry(all);
+  closePantryModal();
+  if(isLow(it) && !wasLow && addToShopList(it.name)) pantryNote('🛒 ' + it.name + ' foi para a lista de compras');
+  renderPantry();
+}
+function deletePantryItem(){
+  if(!pantryEditId) return;
+  savePantry(loadPantry().filter(i => i.id !== pantryEditId));
+  closePantryModal();
+  renderPantry();
+}
+renderPantry();
 
 /* ---------- CALENDÁRIO ---------- */
 function loadEvents(){ return JSON.parse(localStorage.getItem('fp_events') || '{}'); }
