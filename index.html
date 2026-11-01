@@ -75,7 +75,7 @@
   /* ---------- GRID ---------- */
   .grid{
     display:grid;
-    grid-template-columns:1fr 2.2fr 0.85fr;
+    grid-template-columns:minmax(0,1fr) minmax(0,2.2fr) minmax(0,0.85fr);
     gap:16px;
     min-height:0;
   }
@@ -161,6 +161,18 @@
     border:none;border-radius:12px;background:var(--sage);color:#fff;padding:9px 0;margin-bottom:8px;
     font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;
   }
+  .pan-search{
+    border:none;border-radius:12px;padding:9px 12px;margin-bottom:8px;width:100%;
+    font-family:'Quicksand',sans-serif;font-size:0.9rem;background:var(--cream);
+  }
+  .pan-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;flex-shrink:0;}
+  .chip{
+    flex-shrink:0;border:none;border-radius:14px;padding:5px 9px;cursor:pointer;white-space:nowrap;
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.76rem;
+    background:var(--cream);color:var(--cocoa);
+  }
+  .chip.on{background:var(--cocoa);color:#fff;}
+  .chip i{font-style:normal;opacity:0.7;margin-left:3px;font-weight:600;}
   .pan-msg{font-size:0.72rem;font-weight:600;color:var(--cocoa);min-height:0;margin:0 2px 6px;}
   .pan-msg:empty{display:none;}
   .pan-group{
@@ -388,6 +400,9 @@
 
       <div class="pane hide" id="panePantry">
         <button class="pan-add" onclick="openPantryModal()">+ Novo item</button>
+        <input id="pantrySearch" class="pan-search" type="text" placeholder="🔍 Procurar na dispensa…" autocomplete="off" oninput="setPanQuery(this.value)">
+        <div class="pan-chips" id="panStatusChips"></div>
+        <div class="pan-chips" id="panCatChips"></div>
         <div class="pan-msg" id="pantryMsg"></div>
         <div class="scroll" id="pantryList"></div>
       </div>
@@ -652,6 +667,7 @@ const PANTRY_SEED = [
   ['Ração do Dior','dior'],['Areia do Dior','dior']
 ];
 let pantryEditId = null, pantryMsgTimer = null;
+let panStatus = 'all', panCat = 'all', panQuery = '';
 
 function normName(s){
   let t = String(s == null ? '' : s).toLowerCase();
@@ -741,14 +757,52 @@ function restockPantryFor(text){
     renderPantry();
   }
 }
+function setPanQuery(v){ panQuery = v || ''; renderPantry(); }
+function setPanStatus(v){ panStatus = v; renderPantry(); }
+function setPanCat(v){ panCat = (panCat === v) ? 'all' : v; renderPantry(); }
+function clearPanFilters(){
+  panStatus = 'all'; panCat = 'all'; panQuery = '';
+  document.getElementById('pantrySearch').value = '';
+  renderPantry();
+}
+function renderPanChips(all){
+  const q = normName(panQuery);
+  // contagens respeitam a pesquisa e o estado, para a categoria mostrar o que realmente aparece
+  const base = all.filter(i => (!q || normName(i.name).indexOf(q) !== -1));
+  const nLow = base.filter(isLow).length;
+  const status = [['all','Tudo',base.length],['low','⚠️ A acabar',nLow],['ok','✅ Disponível',base.length - nLow]];
+  document.getElementById('panStatusChips').innerHTML = status.map(s =>
+    '<button class="chip ' + (panStatus === s[0] ? 'on' : '') + '" onclick="setPanStatus(\'' + s[0] + '\')">' +
+    s[1] + '<i>' + s[2] + '</i></button>').join('');
+  const byStatus = base.filter(i => panStatus === 'all' || (panStatus === 'low' ? isLow(i) : !isLow(i)));
+  document.getElementById('panCatChips').innerHTML = PANTRY_CATS.map(c => {
+    const n = byStatus.filter(i => i.cat === c[0]).length;
+    if(!n && panCat !== c[0]) return '';
+    return '<button class="chip ' + (panCat === c[0] ? 'on' : '') + '" onclick="setPanCat(\'' + c[0] + '\')">' +
+      c[1] + ' ' + esc(c[2].split(' ')[0]) + '<i>' + n + '</i></button>';
+  }).join('');
+}
 function renderPantry(){
-  const all = loadPantry();
+  const everything = loadPantry();
   const box = document.getElementById('pantryList');
-  const low = all.filter(isLow);
   const badge = document.getElementById('pantryBadge');
-  badge.textContent = low.length || '';
-  badge.classList.toggle('on', low.length > 0);
+  const lowCount = everything.filter(isLow).length;
+  badge.textContent = lowCount || '';
+  badge.classList.toggle('on', lowCount > 0);
+  document.getElementById('pantrySearch').style.display = everything.length ? '' : 'none';
+  if(everything.length) renderPanChips(everything);
+  else { document.getElementById('panStatusChips').innerHTML = ''; document.getElementById('panCatChips').innerHTML = ''; }
+  const q = normName(panQuery);
+  const all = everything.filter(i =>
+    (panCat === 'all' || i.cat === panCat) &&
+    (panStatus === 'all' || (panStatus === 'low' ? isLow(i) : !isLow(i))) &&
+    (!q || normName(i.name).indexOf(q) !== -1));
+  const low = all.filter(isLow);
 
+  if(everything.length && !all.length){
+    box.innerHTML = '<div class="empty">Nada encontrado 🌿<br><button class="pan-seed" onclick="clearPanFilters()">Limpar filtros</button></div>';
+    return;
+  }
   if(!all.length){
     box.innerHTML = '<div class="empty">Ainda não há nada na dispensa 🌿<br>' +
       '<button class="pan-seed" onclick="seedPantry()">💡 Começar com exemplos</button></div>';
